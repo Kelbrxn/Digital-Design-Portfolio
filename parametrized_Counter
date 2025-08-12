@@ -1,0 +1,103 @@
+
+module counter #(parameter WIDTH = 8) (
+    input logic clk,
+    input logic rst,
+    output logic [WIDTH-1:0] counter,
+    input logic enable,
+    input logic load,
+    input logic [WIDTH-1:0] load_value,
+    input logic direction
+);
+  
+  always @(posedge clk or posedge rst) begin
+    if (rst) begin
+        counter <= 0;
+    end 
+    else if (load) begin
+        counter <= load_value;
+    end 
+    else if (enable) begin
+        if (direction) begin
+            counter <= counter + 1;    // Count up
+        end 
+      	else begin
+            counter <= counter - 1;    // Count down  
+        end
+    end
+    // If none of the above conditions are met, counter holds its value
+end
+endmodule
+
+module counter_tb;
+    logic clk;
+    logic rst;
+    logic [7:0] counter;
+    logic enable;
+    logic load;
+    logic [7:0] load_value;
+    logic direction;
+    
+    counter #(.WIDTH(8)) DUT(
+        .clk(clk),
+        .rst(rst),
+        .counter(counter),
+        .enable(enable),
+        .load(load),
+        .load_value(load_value),
+        .direction(direction)
+    );
+    
+    initial begin
+        clk = 0;
+    end
+    
+    always begin
+        #10 clk = ~clk;
+    end
+    
+    initial begin
+        rst = 1;
+        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
+        #5
+        rst = 0;
+        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
+        #5
+        direction = 1;
+        enable = 1;
+        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
+        #5
+        #100
+        load_value = 10;
+        load = 1;
+        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
+        #5
+        direction = 0;
+        enable = 1;
+        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
+        #100
+        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
+        rst = 1;
+        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
+        #5
+        rst = 0;
+		//$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
+        #5
+        direction = 1;
+        enable = 1;
+        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
+        #5
+        #100
+        rst = 1;
+		//$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
+        #5
+        rst = 0;
+        $display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
+        #5
+        $finish;
+    end
+    
+initial begin
+  $dumpfile("counter.vcd");
+  $dumpvars(0, counter_tb);
+end
+endmodule
