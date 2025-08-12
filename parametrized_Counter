@@ -60,21 +60,30 @@ module counter_tb;
         //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         #5
         rst = 0;
+        load_value = 10;
         //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         #5
         direction = 1;
         enable = 1;
         //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
-        #5
         #100
-        load_value = 10;
+//APO EDW KAI KATW SINANTAW THEMATA XRONISMOY
+      rst = 1;
+      #5
+      rst = 0;
+        enable = 0;
+      #5
         load = 1;
-        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         #5
-        direction = 0;
-        enable = 1;
+        load = 0;
+      #5
+      	enable=1;
+            direction = 0;
+      	#5
+        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter); 
+
         //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
-        #100
+        #200
         //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         rst = 1;
         //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
