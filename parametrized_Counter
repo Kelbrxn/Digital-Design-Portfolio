@@ -57,50 +57,40 @@ module counter_tb;
     
     initial begin
         rst = 1;
-        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
-        #5
+     	load=0;
+     	load_value=0;
+      	direction=0;
+      	enable=0;
+    	#5
         rst = 0;
         load_value = 10;
-        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
-        #5
+        #15
         direction = 1;
         enable = 1;
-        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         #100
-//APO EDW KAI KATW SINANTAW THEMATA XRONISMOY
-      rst = 1;
-      #5
-      rst = 0;
-        enable = 0;
-      #5
+      	rst = 1;
+    	enable = 0;
+      	direction=0;
+      	#5
+      	rst = 0;
+      	#5
         load = 1;
         #5
         load = 0;
-      #5
       	enable=1;
             direction = 0;
-      	#5
-        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter); 
-
-        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         #200
-        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         rst = 1;
-        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         #5
         rst = 0;
-		//$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         #5
         direction = 1;
         enable = 1;
-        //$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         #5
         #100
         rst = 1;
-		//$display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         #5
         rst = 0;
-        $display("Time=%0t, rst=%b, load=%b, load_value=%d, direction=%b, enable=%b, counter=%d", $time, rst, load, load_value, direction, enable, counter);
         #5
         $finish;
     end
