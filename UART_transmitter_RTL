@@ -1,0 +1,133 @@
+module uart_transmitter#(
+    parameter int CLK_FREQ = 27_000_000,
+    parameter int BAUD_RATE = 115200
+) (
+    input  logic         clk,
+    input  logic         rst_n,        // Active low reset
+    input  logic [7:0]   tx_data,
+    input  logic         tx_start,
+    output logic         tx_out,
+    output logic         tx_done,
+    output logic         tx_ready,
+    output logic         tx_busy,
+    output logic parity_bit
+);
+// localparam calculations 
+localparam int CYCLES_PER_BIT = CLK_FREQ / BAUD_RATE;
+localparam int COUNTER_WIDTH = $clog2(CYCLES_PER_BIT);
+
+// Timing
+  logic        [2:0] bit_counter;
+logic baud_tick;
+logic counter_enable, counter_load;
+logic [COUNTER_WIDTH-1:0] load_value;
+      logic direction;
+// State machine signals
+typedef enum logic [2:0] {
+    IDLE   = 3'b000,
+    START  = 3'b001,
+    DATA   = 3'b010,
+    PARITY = 3'b011,
+    STOP   = 3'b100
+} state_t;
+state_t current_state, next_state;
+always @(posedge clk or negedge rst_n) begin
+if (!rst_n) begin
+current_state <= IDLE;
+end
+    else
+        begin
+current_state <= next_state;
+        end
+end
+always_comb begin
+if (^tx_data) begin
+parity_bit = 1;
+end 
+else begin
+parity_bit = 0;
+    end
+end
+always_comb begin
+tx_out=1;
+next_state=current_state;
+case (current_state)
+IDLE: begin
+tx_ready=1;
+tx_busy= 0;
+tx_out = 1;
+if(tx_start) begin
+next_state = START;
+    end
+end
+START: begin
+tx_busy=1;
+tx_ready=0;
+tx_out=0;
+if(baud_tick) begin
+next_state = DATA;
+    end
+end
+DATA: begin
+tx_out=tx_data[bit_counter];
+if(baud_tick) begin
+if (bit_counter == 3'd7) begin
+next_state = PARITY;
+bit_counter = 3'd0;
+end
+else begin
+bit_counter = bit_counter + 1;
+next_state = DATA;
+    end
+end
+PARITY: begin
+tx_out = parity_bit;
+if(baud_tick) begin
+next_state=STOP;
+end
+end
+STOP: begin
+tx_out=1;
+if(baud_tick) begin
+tx_done=1;
+next_state = IDLE;
+end
+endcase
+end
+endmodule
+
+module counter #(
+    parameter int CLK_FREQ = 27_000_000,
+    parameter int BAUD_RATE = 115200
+) (
+    input logic clk,
+    input logic rst_n,
+    output logic [WIDTH-1:0] counter,  // WIDTH calculated inside
+    input logic enable,
+    input logic load,
+    input logic [WIDTH-1:0] load_value,
+    input logic direction
+);
+
+// Auto-calculate parameters inside counter module
+localparam int CYCLES_PER_BIT = CLK_FREQ / BAUD_RATE;
+localparam int WIDTH = $clog2(CYCLES_PER_BIT);
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        counter <= 0;
+    end 
+    else if (load) begin
+        counter <= load_value;
+    end 
+    else if (enable) begin
+        if (direction) begin
+            counter <= counter + 1;    // Count up
+        end 
+          else begin
+            counter <= counter - 1;    // Count down  
+        end
+    end
+    // If none of the above conditions are met, counter holds its value
+end
+
+endmodule
