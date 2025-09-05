@@ -1,0 +1,82 @@
+typedef enum logic [2:0] {
+    IDLE      = 3'b000,
+    FILL_A    = 3'b001,
+    FILL_B    = 3'b010,
+    MIXING    = 3'b011,
+    DRAINING  = 3'b100,
+    COMPLETE  = 3'b101,
+    EMERGENCY = 3'b111
+} state_t;
+
+state_t current_state, next_state;
+
+// Sequential: update state on clock
+always_ff @(posedge clk or posedge rst) begin
+    if (rst)
+        current_state <= IDLE;
+    else
+        current_state <= next_state;
+end
+
+
+always_comb begin//state declaration
+    case (current_state)
+        IDLE: begin
+          y0=0;
+          y1=0;
+          y2=0;
+          y3=0;
+            if (x0) next_state = FILL_A;
+            else    next_state = IDLE;
+        end
+        FILL_A: begin
+          y0=1;
+          y1=0;
+          y2=0;
+          y3=0;
+          if (x1) begin
+            next_state = FILL_B;
+          end
+		FILL_B: begin
+		  y0=0;
+          y1=1;
+          y2=0;
+          y3=0;
+          if (x1) begin
+            next_state <= MIXING;
+          end
+        end
+          MIXING: begin
+          y0=0;
+          y1=0;
+          y2=0;
+          y3=1;
+            if(timer_done) begin
+              next_State <= DRAINING;
+            end
+          end
+          DRAINING: begin
+          y0=0;
+          y1=0;
+          y2=1;
+          y3=0;
+            if(timer_done) begin
+              next_state <= COMPLETE;
+            end
+          end
+          COMPLETE: begin
+          y0=0;
+          y1=0;
+          y2=0;
+          y3=0; 
+            if(counter) begin
+              next_state <=IDLE;
+            end
+          end
+          EMERGENCY: begin
+            if(!rst_n) begin
+              next_state <= IDLE;
+            end
+          end
+    endcase
+end
