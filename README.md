@@ -1,2 +1,2 @@
 # Digital-Design-Portfolio
-Welcome to my Journey as an aspiring Digital Design Engineer. My name is Georgios Kelgiorgis and you will find multiple SystemVerilog projects I have worked on as a portfolio to showcase my experience learning SystemVerilog and digital Design
+Welcome to my Journey as an aspiring Digital Design Engineer. My name is Georgios Kelgiorgis and you will find multiple SystemVerilog projects I have worked on as a portfolio to showcase my experience learning SystemVerilog and digital Design. I am mainly using EDA Playground by Doulos and will eventually move onto industry standard tools. Will soon add RTL level schematics for each project completed.
