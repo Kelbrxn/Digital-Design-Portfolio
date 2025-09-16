@@ -7,7 +7,7 @@ module counter #(parameter WIDTH = 8) (
     input logic load,
     input logic [WIDTH-1:0] load_value,
     input logic direction
-    output logic done
+    output logic counter_done
 );
   
   always @(posedge clk or posedge rst) begin
@@ -32,8 +32,8 @@ end
     if (!direction && counter == 0)        // reached 0 on down-count
         done = 1;
     else if (direction && counter == {WIDTH{1'b1}})  // reached max on up-count
-        done = 1;
+        counter_done = 1;
     else
-        done = 0;
+        counter_done = 0;
   end
 endmodule
