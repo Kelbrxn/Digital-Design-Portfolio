@@ -30,7 +30,7 @@ end
       // "done" flag logic
   always_comb begin
     if (!direction && counter == 0)        // reached 0 on down-count
-        done = 1;
+        counter_done = 1;
     else if (direction && counter == {WIDTH{1'b1}})  // reached max on up-count
         counter_done = 1;
     else
