@@ -6,7 +6,7 @@ module counter #(parameter WIDTH = 8) (
     input logic enable,
     input logic load,
     input logic [WIDTH-1:0] load_value,
-    input logic direction
+    input logic direction,
     output logic counter_done
 );
   
