@@ -1,4 +1,4 @@
-module top_module #(
+module liquid_mixer #(
     parameter WIDTH = 8   // default, can be overridden at instantiation
 )(
   input logic clk,
