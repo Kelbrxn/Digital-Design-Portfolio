@@ -1,27 +1,65 @@
 module uart_transmitter#(
     parameter int CLK_FREQ = 27_000_000,
     parameter int BAUD_RATE = 115200
-) (
-    input  logic         clk,
-    input  logic         rst_n,        // Active low reset
+)(
+  //uart signals
+    input  logic         rst_n,
     input  logic [7:0]   tx_data,
     input  logic         tx_start,
     output logic         tx_out,
     output logic         tx_done,
     output logic         tx_ready,
     output logic         tx_busy,
-    output logic parity_bit
-);
-// localparam calculations 
+    output logic 		 parity_bit,
+  
+  //internal signals 
+
+logic baud_counter,
+  logic baud_tick,
+  
+  //counter signals
+    input logic clk,
+  output logic [COUNTER_WIDTH-1:0] counter,  // WIDTH calculated inside
+    input logic enable,
+    input logic load,
+  input logic [COUNTER_WIDTH-1:0] load_value,
+    input logic direction
+  
+  // localparam calculations 
 localparam int CYCLES_PER_BIT = CLK_FREQ / BAUD_RATE;
 localparam int COUNTER_WIDTH = $clog2(CYCLES_PER_BIT);
-
-// Timing
-  logic        [2:0] bit_counter;
-logic baud_tick;
-logic counter_enable, counter_load;
-logic [COUNTER_WIDTH-1:0] load_value;
-      logic direction;
+  
+//parameterized counter with automatic length calculation  
+  always @(posedge clk or negedge rst_n) begin
+    if (!rst_n) begin
+        counter <= 0;
+    end 
+    else if (load) begin
+        counter <= load_value;
+    end 
+    else if (enable) begin
+        if (direction) begin
+            counter <= counter + 1;    // Count up
+        end 
+          else begin
+            counter <= counter - 1;    // Count down  
+        end
+    end
+    // If none of the above conditions are met, counter holds its value
+end
+  
+  //buad_tick generation with edge detection, parallel always block
+  always_ff @(posedge clk or negedge rst_n) begin
+    if(!rst_n) begin
+      baud_counter <= counter;
+      baud_tick <= 0;
+      else begin
+        baud_counter <= counter;
+        baud_tick <= (counter != baud_counter);
+      end
+    end
+  end
+  
 // State machine signals
 typedef enum logic [2:0] {
     IDLE   = 3'b000,
@@ -31,6 +69,7 @@ typedef enum logic [2:0] {
     STOP   = 3'b100
 } state_t;
 state_t current_state, next_state;
+  //state switch logic
 always @(posedge clk or negedge rst_n) begin
 if (!rst_n) begin
 current_state <= IDLE;
@@ -40,6 +79,8 @@ end
 current_state <= next_state;
         end
 end
+  //even parity bit calculation
+  
 always_comb begin
 if (^tx_data) begin
 parity_bit = 1;
@@ -48,9 +89,11 @@ else begin
 parity_bit = 0;
     end
 end
+  
 always_comb begin
 tx_out=1;
 next_state=current_state;
+  
 case (current_state)
 IDLE: begin
 tx_ready=1;
@@ -60,6 +103,7 @@ if(tx_start) begin
 next_state = START;
     end
 end
+  
 START: begin
 tx_busy=1;
 tx_ready=0;
@@ -68,6 +112,7 @@ if(baud_tick) begin
 next_state = DATA;
     end
 end
+  
 DATA: begin
 tx_out=tx_data[bit_counter];
 if(baud_tick) begin
@@ -96,37 +141,6 @@ endcase
 end
 endmodule
 
-module counter #(
-    parameter int CLK_FREQ = 27_000_000,
-    parameter int BAUD_RATE = 115200
-) (
-    input logic clk,
-    input logic rst_n,
-    output logic [WIDTH-1:0] counter,  // WIDTH calculated inside
-    input logic enable,
-    input logic load,
-    input logic [WIDTH-1:0] load_value,
-    input logic direction
-);
-
-// Auto-calculate parameters inside counter module
-localparam int CYCLES_PER_BIT = CLK_FREQ / BAUD_RATE;
-localparam int WIDTH = $clog2(CYCLES_PER_BIT);
-  always @(posedge clk or negedge rst_n) begin
-    if (!rst_n) begin
-        counter <= 0;
-    end 
-    else if (load) begin
-        counter <= load_value;
-    end 
-    else if (enable) begin
-        if (direction) begin
-            counter <= counter + 1;    // Count up
-        end 
-          else begin
-            counter <= counter - 1;    // Count down  
-        end
-    end
     // If none of the above conditions are met, counter holds its value
 end
 
